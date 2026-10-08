@@ -29,7 +29,7 @@ The warm median held steady across the four blocks of 15 runs: 7.2 s, 7.2 s, 7.1
 | route (lake → dam) | 2048 MB | 59 | 0.473 s (0.471–0.475) | 0.519 s | 0.545 s | 0.81–0.97 s | 194 MB |
 | report | 512 MB | 59 | 0.179 s (0.175–0.185) | 0.234 s | 0.252 s | 0.73–0.77 s | 184 MB |
 
-CloudWatch recorded 60 plan, 120 measure, 60 route and 60 report invocations over the batch, with **0 errors and 0 throttles**. The account's Lambda concurrency limit is 10, and each run uses at most 2 functions at once.
+CloudWatch recorded 60 plan, 120 measure, 60 route and 60 report invocations over the batch, with **0 errors and 0 throttles**. The Lambda logs show at most 2 invocations running at once. That's well under the account's concurrency limit, which was 10 at the time; the limit is an account setting, so it isn't in the evidence.
 
 ### Cold starts
 
@@ -50,7 +50,7 @@ CloudWatch recorded 60 plan, 120 measure, 60 route and 60 report invocations ove
 | Peak flow / depth at the dam | 10,541 m³/s / 15.9 m | 10,541 m³/s / 15.9 m | 1 |
 | Warning time | 137.7 min | 137.7 min | 1 |
 
-The October high end differs from the local run by 0.0004 km². The first cloud run merged a ~330 m² sliver into the stored lake footprint. Every run since then has produced identical outputs.
+The October high end differs from the local run by 0.0004 km². The first cloud run grew the stored lake footprint, which moved the October range from 1.2061–1.4634 km² in that run to 1.2063–1.464 km² in every run since. Every run since then has produced identical outputs. We measured the added area at about 330 m², but each run overwrites the footprint file, so that measurement isn't in the evidence.
 
 ### What these numbers do and don't show
 
@@ -58,7 +58,7 @@ The October high end differs from the local run by 0.0004 km². The first cloud 
 - **Tail latency.** With 59 warm runs, the slowest run (8.2 s) is a 95% upper bound for warm p95 (1 − 0.95⁵⁹ = 0.952). That's why the batch had 60 runs rather than 20: with 20, the slowest run would be only a 64% bound. Medians use distribution-free confidence intervals from order statistics.
 - **Warm runs flatter real use.** Each warm run re-reads the same satellite image windows, and GDAL's in-memory HTTP cache probably serves part of them. A real run on new scenes will sit closer to the cold invoke times, about 10–12 s per lake-month.
 - **Cold starts are few.** Three cold runs are enough to show the pattern, not a distribution. Sampling more needs runs spaced 20–30 minutes or more apart, or a redeploy.
-- **The stored footprint drifts.** Its outline changes at the floating-point level on every run (45 of 45 hashed runs), without changing any output. Its size is stable at 449 vertices and 17.9 KiB.
+- **The stored footprint drifts.** Its outline changes at the floating-point level on every run (45 of 45 hashed runs), without changing any output. After the last run the stored file had 449 vertices (17.9 KiB), the same size as in our earlier checks. The bucket keeps no old versions, so the evidence can't show the size over time.
 - **One case study.** All of this is one lake and one event, the 2023 South Lhonak flood.
 
 **Cost:** 2,094 GB-s of Lambda time, 300 requests and about 7 state transitions per run comes to **$0.0455 for the 60 runs** ($0.00076 per run) at on-demand prices, inside the AWS free tier.
