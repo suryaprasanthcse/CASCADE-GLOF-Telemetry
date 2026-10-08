@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Environments and secrets
+.env
+.venv
+env/
+venv/
+
+# Raster data
+*.tif
+*.tiff
+*.cog
+data/
+
+# OS and editors
+.DS_Store
+.vscode/
+.idea/
