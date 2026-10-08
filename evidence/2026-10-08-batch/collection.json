@@ -1,0 +1,30 @@
+{
+ "account": "<ACCOUNT>",
+ "collected_at": "2026-10-08T18:13:18.396423+00:00",
+ "counts": {
+  "cloudtrail_start_execution": 62,
+  "executions": 62,
+  "init_report_lines": 4,
+  "report_lines": 310
+ },
+ "functions": {
+  "measure": "cascade-glof-MeasureFunction-Naht8GDR8Oq9",
+  "plan": "cascade-glof-PlanFunction-nSiex2L5jBmY",
+  "report": "cascade-glof-ReportFunction-vVcLw6g2KVrT",
+  "route": "cascade-glof-RouteFunction-xE12ZN3FR0NR"
+ },
+ "log_groups": {
+  "measure": "/cascade/cascade-glof/measure",
+  "plan": "/cascade/cascade-glof/plan",
+  "report": "/cascade/cascade-glof/report",
+  "route": "/cascade/cascade-glof/route",
+  "statemachine": "/cascade/cascade-glof/statemachine"
+ },
+ "region": "us-west-2",
+ "stack": "cascade-glof",
+ "state_machine_arn": "arn:aws:states:us-west-2:<ACCOUNT>:stateMachine:CascadePipeline-7RniisVtJTSj",
+ "window": {
+  "end": "2026-10-08T15:50:00+00:00",
+  "start": "2026-10-08T14:40:00+00:00"
+ }
+}

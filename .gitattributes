@@ -1,0 +1,2 @@
+# Evidence files are hashed in MANIFEST.sha256: never convert their line endings.
+evidence/** -text
