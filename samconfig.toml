@@ -16,4 +16,4 @@ disable_rollback = false
 
 [default.deploy.parameters.parameter_overrides]
 MeasureConcurrencyCap = "0"
-LogRetentionDays = "14"
+LogRetentionDays = "90"
