@@ -8,7 +8,12 @@ region = "us-west-2"
 cached = true
 
 [default.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
+capabilities = ["CAPABILITY_IAM"]
 confirm_changeset = true
 resolve_s3 = true
 resolve_image_repos = true
+disable_rollback = false
+
+[default.deploy.parameters.parameter_overrides]
+MeasureConcurrencyCap = "0"
+LogRetentionDays = "14"
