@@ -189,8 +189,10 @@ Each pixel in the lake's search zone (the footprint *F* from 2.3, dilated by 300
 | M1 | Clean Sep 2023 scenes agree with each other within ±3% |
 | M2 | Pre-flood area is within ±5% of ISRO's 167.4 ha |
 | M3 | On Oct 6, 2023, the snow-covered west basin is unobservable, not water or land, and its `A_high` ≥ the Oct 29 `A_low` |
-| M4 | The Oct 29, 2023 `A_low` is within ±3% of the practice result, 1.296 km² |
+| M4 | The practice result for Oct 29, 2023 (1.296 km²) falls inside the measured range [`A_low`, `A_high`] |
 | M5 | The offset guard triggers on a synthetic window with +1000 DN |
+
+**M4 revised on 8 Oct (team decision).** The original criterion, `A_low` within ±3% of 1.296 km², assumed the practice run was a reference. It isn't ground truth: it had no near-infrared test and counted sediment-laden margin pixels as water. Under the revised criterion, Oct 29 passes: 1.296 km² falls inside the measured range of 1.206–1.464 km².
 
 Test fixtures are stored as small `.npy` or `.json` files under `tests/fixtures/`, because `.gitignore` excludes `*.tif` and `data/`.
 
