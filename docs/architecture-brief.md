@@ -148,8 +148,17 @@ Each pixel in the lake's search zone (the footprint *F* from 2.3, dilated by 300
 
 - **Unobservable:** cloud, snow/ice/slush and shadow-not-water all count as unobservable, meaning we can't tell whether lake water lies beneath.
 - **Why compute our own shadow mask:** SCL's "dark area" class (2) covered real lake pixels in practice, so we don't use it.
-- **Slope mask, limited use:** outside the footprint, pixels steeper than 15° can't be water, which removes shadow false positives. It's not applied inside the footprint. The lake has grown over ground that the 2011–2015 elevation map records as glacier or moraine.
-- **Calibration:** hand-label about 200 points in each of four practice scenes, then check and adjust the thresholds on them:
+- **No slope mask (dropped on 8 Oct after testing):** v1 of this brief proposed that pixels steeper than 15° outside the footprint can't be water. On real data, the 2011–2015 elevation map shows about 8% of the Sep 2023 lake as steeper than 15°, where glacier has since melted into lake. The rule removed about 0.11 km² of real lake on Sep 14 and would hide exactly the growth we want to detect.
+- **First calibration (8 Oct), with whole regions as labels:** the Sep 14 and Sep 26 lake as certain water (33,484 pixels), and the snow-flagged Oct 6 basin as certain snow/slush (10,544 pixels).
+
+  | NIR ceiling for water | Water kept | Snow/slush let through as water |
+  |---|---|---|
+  | **0.11 (kept)** | **97.3%** | **2.3%** |
+  | 0.15 | 98.7% | 8.3% |
+  | 0.20 | 99.7% | 30% |
+
+  The water lost at 0.11 is mostly mixed shoreline and sediment-laden pixels, and the edge uncertainty covers it. A higher ceiling would let slush into the "visible water" figure.
+- **Still to do:** hand-label about 200 points in each of four practice scenes, then check the thresholds on them:
 
   | Date | Condition |
   |---|---|
