@@ -207,7 +207,8 @@ Test fixtures are stored as small `.npy` or `.json` files under `tests/fixtures/
 3. **Flow path:** compute D8 flow directions and trace downhill from the lake outlet, until past the Teesta-III dam. If the path passes more than 200 m from the dam point, fail loudly.
 4. **Centreline:** smooth the D8 staircase (it makes the path longer than it is), resample every 30 m, and compute distance along the path. Compare the length with the published 67.5 km.
 5. **River profile:** sample elevation along the centreline and force it to only go downhill (running minimum), which removes spikes in the map. Compute the bed slope *S₀* over reaches of about 500 m, with a floor of 0.001.
-6. **Cross-sections:** for each reach, take a ±1 km line across the valley, sampled every 15 m. From it, tabulate flow area *A(h)*, wetted perimeter *P(h)* and top width *B(h)* for water depths up to about 60 m.
+6. **Cross-sections:** for each reach, take a ±1 km line across the valley, sampled every 15 m. From it, tabulate flow area *A(h)*, top width *B(h)* and conveyance for water depths up to 80 m.
+   - **As built (8 Oct):** conveyance is summed strip by strip, with each 15 m strip using its own depth. Taking the section as one whole made conveyance *fall* as water spread over the flat upper valley, in 83 of 132 reaches; summed per strip, it only ever grows with depth.
 7. **Assets:** place the Teesta-III dam, Chungthang, and the OpenStreetMap bridges and settlements within 500 m of the path onto it.
 
 Outputs: `path.geojson`, `reaches.json`, `assets.json`.
@@ -215,7 +216,11 @@ Outputs: `path.geojson`, `reaches.json`, `assets.json`.
 ### 3.2 The flood released at the lake
 
 **Two modes:**
-- **Hindcast (validation):** the volume is fixed to the published drained volume, about 50 million m³ (still to be verified). This tests routing on its own.
+- **Hindcast (validation):** the volume is fixed to the published drained volume, about 50 million m³. This tests routing on its own.
+  - **As built (8 Oct):** the 2023 hindcast uses the lake outflow reconstructed by Sattar et al. (2025, *Science*, Fig. 3D), digitised by eye:
+    - **Timing:** a ~3-minute impulse wave peaking at 48,500 m³/s about 2 minutes after the 22:12:20 IST collapse, then a breaching plateau near 17,000 m³/s, then near-constant discharge (~10,500 m³/s) from ~18 minutes.
+    - **Coverage:** the paper models 30 minutes (23.5 million m³). Holding the constant discharge until the locked 50 million m³ is out, then a 10-minute ramp down, is our assumption.
+    - **Formula triangles:** they remain the source for forecasting other lakes.
 - **Forecast (the product):** volume = *f*(area) × drainage fraction.
   - *f*(area) comes from published area–volume formulas, such as Huggel et al. 2002, *V* = 0.104·*A*^1.42 (*A* in m², *V* in m³), plus one or two Himalaya-specific ones. Their spread becomes the band.
   - **Check:** an area of 1.704 km² gives about 73 million m³ (Huggel). A release of about 50 million m³ would mean roughly two-thirds drained, which fits the 1.3 km² of lake we saw remaining.
@@ -255,6 +260,15 @@ $$C=\frac{c\,\Delta t}{\Delta x}\ \text{(Courant number)},\qquad D=\frac{Q}{B\,S
 - **Stability checks:** keep *C* roughly between 0.5 and 2 at the peak, and watch the signs of the coefficients.
 - **Mass balance:** water out must equal water in, within 1%.
 - **Cost:** 135 reaches × about 1,000 steps × 108 ensemble members is about 15 million updates. Vectorised numpy does that in about a second.
+
+**As built (8 Oct)**, after the plain scheme above failed on this flood:
+- **Time step:** Δ*t* is the longest step up to 30 s that keeps *C* ≤ 1.9 in every reach at the source peak. Steep reaches carry waves near 80 m/s.
+- **Positivity:**
+  - **The problem:** at the dam-break front the wave is near-kinematic (*D* ≈ 0) and slow at its foot (*C* ≪ 1). There, Ponce's *C₀* went negative, flows went below zero, and the run blew up.
+  - **The fix:** Cunge's *X* = (1 − *D*)/2 is lowered only where Muskingum's positivity condition binds (*X* ≤ *C*/2 and *X* ≤ 1 − *C*/2). That adds the least numerical diffusion that keeps every weight non-negative.
+- **Mass conservation:** computing each step's parameters once made up to 82% extra water. Each step's storage *S* = *K*[*XI* + (1 − *X*)*O*] now uses that step's own *K* and *X*, with the outflow solved from continuity and refined over three passes. This is the idea behind Todini's (2007) mass-conservative Muskingum–Cunge; storage telescopes, so water is conserved exactly.
+- **Numerics:** halving Δ*t* twice moves arrival by under half a minute.
+- **Speed:** cells are solved one anti-diagonal (step + reach) at a time, so a hindcast takes well under a second.
 
 ### 3.4 Impacts at each asset
 
@@ -297,8 +311,12 @@ The team locked four values as the official Day 1 constants on 8 Oct.
 | Volume drained | ~50 million m³ | Blueprint; Sattar et al., *Science* 2025 | **Locked, Day 1 constant** |
 | Lake → Chungthang distance | 67.5 km | Blueprint | **Locked, Day 1 constant**; our flow path gives an independent figure |
 | Flood arrival at Chungthang / Teesta-III dam breach | ~00:30 IST, Oct 4 | Blueprint | **Locked, Day 1 constant** |
-| Lake release (breach) time | **Unknown** | Needed for arrival-time validation | Missing; must be sourced before test R3 |
-| Peak flow at Chungthang | 5,340–14,673 m³/s across studies | Blueprint | Unverified |
+| Lake release time (moraine collapse) | 22:12:20 IST, Oct 3 (16:42:20 UTC, seismic force inversion) | Sattar et al., *Science* 2025, main text | Sourced 8 Oct; Petley's Eos blog gives 22:13:20 |
+| Flood arrival at the ITBP camp, ~7 km downstream | ~22:30:00 IST, Oct 3 | Sattar et al. 2025, reported by ITBP | Sourced; used as a diagnostic, not a test |
+| Teesta-III dam location | 27.5981°N, 88.6505°E | Global Energy Monitor wiki | Approximate (~1 km); the flow path ends at the lowest valley cell within 1 km of it |
+| Peak flow at Chungthang | 5,340 m³/s | Sattar et al. 2025 (HEC-RAS, water only, Manning's *n* = 0.05, 4 m DEM) | Sourced |
+| Peak flow at Chungthang | ~7,355 m³/s | 2025 *Natural Hazards* reconstruction (abstract) | Sourced |
+| Peak flow at Chungthang, upper end | 14,673 m³/s | Blueprint | Unverified |
 
 Any unlocked figure we can't verify gets dropped from the claims.
 
@@ -325,6 +343,30 @@ Any unlocked figure we can't verify gets dropped from the claims.
 | R3 | The arrival-time band contains the published arrival time, given the published release time |
 
 **Calibration rule:** if R3 fails, Manning's *n* may be adjusted to match arrival time only. R2 then stays an independent check, and the writeup says this was done.
+
+**Calibration limits, fixed on 8 Oct before the first calibration run:**
+- **What gets calibrated:** a single *n* for the whole channel. It's fitted so that the median arrival across the hindcast ensemble lands on the benchmark: release plus travel time equals 00:30 IST. The release time was 22:13:20 when these limits were set and was corrected to the primary source's 22:12:20.
+- **Arrival tolerance:** ±10 minutes, since the benchmark is "about 00:30".
+- **Plausible range for *n*:** the calibrated value must lie in **0.03–0.20**. That spans clear-water mountain rivers (about 0.03–0.07) up to Jarrett's high-gradient estimate, roughly 0.1 at a 5% slope. If calibration needs *n* outside this range, R3 fails, because the model is then missing physics (sediment bulking, breach dynamics) that roughness can't stand in for.
+- **Peak flow stays independent:** the peak-flow formulas take only the volume and never see *n*.
+
+**Results (8 Oct), with the limits above unchanged:**
+
+1. **First run: formula triangles, failed.** The six peak-formula triangles needed *n* = 0.216 to arrive on time, outside 0.03–0.20, so R3 failed as designed. The test was kept.
+2. **Model change, chosen before re-running.** The source was replaced with the published reconstruction (section 3.2). It was chosen from independent evidence, not fitted to the arrival time, and the writeup must say it changed after the first result.
+3. **Second run: reconstructed outflow, all six tests pass:**
+
+   | Test | Result |
+   |---|---|
+   | P1, path length | 66.21 km against 67.5 km (−1.9%) |
+   | R1, water balance | Exact |
+   | R2, peak at the dam | 10,541 m³/s, inside the band but about 2× Sattar's 5,340 and 1.4× the 7,355 HEC-RAS figure |
+   | Calibration | *n* = **0.175** |
+   | R3, arrival | 00:30:01 IST |
+
+**What to say about these results:**
+- **Effective roughness:** Sattar et al. matched the same arrival with HEC-RAS at *n* = 0.05 on a 4 m DEM. Our *n* of 0.175 is an effective roughness that also absorbs the 30 m DEM, 1D kinematic routing and the valley storage we don't model. It is not a field roughness.
+- **ITBP diagnostic:** the model reaches the ITBP camp at 22:24:37 IST against the reported ~22:30, about 5 minutes early in the upper valley. Our peaks are also high. Both point to too little storage and attenuation in the wide upper valley.
 
 ### 4.6 End to end
 
