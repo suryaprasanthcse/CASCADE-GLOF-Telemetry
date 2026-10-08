@@ -1,3 +1,5 @@
 -r requirements.txt
+boto3
+cfn-lint
 pycodestyle
 pytest

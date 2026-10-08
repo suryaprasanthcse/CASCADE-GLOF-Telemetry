@@ -88,12 +88,15 @@ flowchart LR
 **A. `cascade-terrain`: one-off, per lake.** Read the elevation map window, condition it, trace the flood path, and build the reach and cross-section tables. Place the dam, bridges and towns along the path, then write everything to `s3://…/terrain/<lake>/`. Details are in section 3.1.
 
 **B. `cascade-pipeline`: scheduled, or started through the API.**
-1. **`PlanJobs`** reads the lake registry and emits one item per lake and year.
+1. **`PlanJobs`** reads the lake registry and emits one item per lake and month.
 2. **`Map: MeasureLakePeriod`** (at most 8 in parallel) picks the best scene per month, classifies the pixels, and writes the area range.
 3. **`Map: RouteScenarios`** (one per lake) builds the flood ensemble from the latest confident area and routes it to every asset downstream.
 4. **`PublishDossier`** ranks lakes for each dam and writes the dam dossier JSON plus a one-page PDF. The PDF uses matplotlib's PdfPages, so it needs no extra dependency.
 
-Work is split by lake and year so each Lambda call finishes well inside the 15-minute limit. Practice timings suggest a few minutes per lake-year.
+Work is split by lake and **month** (corrected 8 Oct; v1 said year) so each Lambda call finishes well inside the 15-minute limit.
+- **Why not years:** Sprint 1 scored scenes at about 4.6 s each. A year has 140+ scenes, so scoring alone would take about 11 minutes.
+- **Footprints:** months run in parallel, so a lake's footprint is read during a run and only grown by `PublishDossier` afterwards.
+- **Seeding:** each registered lake therefore needs a real seed outline, not a point. South Lhonak's is its confident 2023-09-14 outline.
 
 ### 1.5 Data layout
 
@@ -109,7 +112,7 @@ Work is split by lake and year so each Lambda call finishes well inside the 15-m
 
 ### 1.6 Quotas, cost and security
 
-- **Lambda concurrency:** new AWS accounts can start with a low limit, sometimes as low as 10. Check it on Day 1 and keep Map concurrency at 8 or below.
+- **Lambda concurrency:** AWS documents a default account limit of 1,000 (v1 of this brief wrongly said new accounts may start at 10). Check the real figure with `aws lambda get-account-settings`. Map concurrency stays at 8 or below, and the measure function reserves 8 by default; set `MeasureConcurrencyCap` to 0 if the account can't reserve that.
 - **Step Functions:** the free tier covers 4,000 state transitions a month, and one full run for one lake is tens of transitions. Even far above that, the cost is cents.
 - **Lambda and DynamoDB:** expected usage sits inside the free tier.
 - **ECR:** a 1 GB image costs cents per month.

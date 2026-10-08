@@ -1,0 +1,48 @@
+# Exact versions for the Lambda image (Python 3.14, Linux x86_64),
+# resolved on 8 Oct 2026 from the top-level versions the test suite ran
+# on: numpy 2.5.3, pyproj 3.8.0, pystac-client 0.9.0, rasterio 1.5.2 and
+# shapely 2.2.0. boto3 comes with the pinned base image.
+affine==3.0.1
+attrs==26.1.0
+certifi==2026.7.22
+charset-normalizer==3.5.2
+click==8.5.0
+idna==3.20
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+numpy==2.5.3
+pyparsing==3.3.3
+pyproj==3.8.0
+pystac==1.15.2
+pystac-client==0.9.0
+pystac-core==1.15.2
+pystac-ext-classification==2.0.1
+pystac-ext-datacube==2.2.1
+pystac-ext-eo==1.1.1
+pystac-ext-file==2.1.1
+pystac-ext-grid==1.1.1
+pystac-ext-item-assets==1.0.1
+pystac-ext-label==1.0.2
+pystac-ext-mgrs==1.0.1
+pystac-ext-mlm==1.4.1
+pystac-ext-pointcloud==1.0.1
+pystac-ext-projection==2.0.1
+pystac-ext-raster==1.1.1
+pystac-ext-render==2.0.0
+pystac-ext-sar==1.0.1
+pystac-ext-sat==1.0.1
+pystac-ext-scientific==1.0.1
+pystac-ext-storage==2.0.1
+pystac-ext-table==1.2.1
+pystac-ext-timestamps==1.1.1
+pystac-ext-version==1.2.1
+pystac-ext-view==1.0.1
+pystac-ext-xarray-assets==1.0.1
+python-dateutil==2.9.0.post0
+rasterio==1.5.2
+referencing==0.37.0
+requests==2.34.2
+rpds-py==2026.9.1
+shapely==2.2.0
+six==1.17.0
+urllib3==2.8.0

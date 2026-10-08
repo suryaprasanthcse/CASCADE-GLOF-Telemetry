@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.aws-sam/
 
 # Environments and secrets
 .env

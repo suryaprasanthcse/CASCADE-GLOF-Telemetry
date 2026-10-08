@@ -109,8 +109,9 @@ class Channel:
     def length_m(self):
         return self.reach_length_m * len(self.slopes)
 
-    def save(self, path):
-        record = {
+    def to_dict(self):
+        """JSON-ready form, rounded well below the DEM's precision."""
+        return {
             "reach_length_m": round(self.reach_length_m, 3),
             "slopes": np.round(self.slopes, 6).tolist(),
             "depths_m": self.depths_m.tolist(),
@@ -120,17 +121,23 @@ class Channel:
             "nodes_lonlat": np.round(self.nodes_lonlat, 6).tolist(),
             "meta": self.meta,
         }
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        Path(path).write_text(json.dumps(record), encoding="utf-8")
 
     @classmethod
-    def load(cls, path):
-        record = json.loads(Path(path).read_text(encoding="utf-8"))
+    def from_dict(cls, record):
         arrays = {key: np.asarray(record[key], dtype=float) for key in (
             "slopes", "depths_m", "areas_m2", "widths_m", "conveyance",
             "nodes_lonlat")}
         return cls(reach_length_m=record["reach_length_m"],
                    meta=record["meta"], **arrays)
+
+    def save(self, path):
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        Path(path).write_text(json.dumps(self.to_dict()), encoding="utf-8")
+
+    @classmethod
+    def load(cls, path):
+        text = Path(path).read_text(encoding="utf-8")
+        return cls.from_dict(json.loads(text))
 
 
 @dataclass(frozen=True)

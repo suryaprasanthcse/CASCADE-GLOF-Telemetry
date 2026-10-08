@@ -1,0 +1,11 @@
+.git
+.venv
+.aws-sam
+.pytest_cache
+__pycache__
+*.py[cod]
+data
+docs
+tests
+*.tif
+*.tiff

@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.global.parameters]
+stack_name = "cascade-glof"
+region = "us-west-2"
+
+[default.build.parameters]
+cached = true
+
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+resolve_image_repos = true

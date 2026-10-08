@@ -1,0 +1,291 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  CASCADE: glacial lake telemetry and outburst-flood routing. One
+  container image, one Lambda function per pipeline step, and a Standard
+  Step Functions workflow. Deploy to us-west-2, beside the Sentinel-2
+  data.
+
+Parameters:
+  MeasureConcurrencyCap:
+    Type: Number
+    Default: 8
+    MinValue: 0
+    Description: >-
+      Reserved concurrency for the measure function, which also caps the
+      load on Earth Search. Use 0 to leave it unreserved, e.g. if the
+      account's Lambda concurrency quota is too low to reserve from.
+  LogRetentionDays:
+    Type: Number
+    Default: 14
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90]
+
+Conditions:
+  CapMeasureConcurrency: !Not [!Equals [!Ref MeasureConcurrencyCap, 0]]
+
+# Functions run outside any VPC: they need the public internet for the
+# Earth Search STAC API, and a NAT gateway would cost money every hour.
+# Open data (Sentinel-2, Copernicus DEM) is read over unsigned HTTPS, so
+# no IAM permission covers it.
+Globals:
+  Function:
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        BUCKET_NAME: !Ref ResultsBucket
+        TABLE_NAME: !Ref ObservationsTable
+        CPL_TMPDIR: /tmp
+        PROJ_NETWORK: "OFF"
+
+Resources:
+  ResultsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  ResultsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ResultsBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !GetAtt ResultsBucket.Arn
+              - !Sub "${ResultsBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+
+  ObservationsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+  PlanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handlers.plan.handler"]
+      MemorySize: 256
+      Timeout: 30
+      LoggingConfig:
+        LogGroup: !Ref PlanLogGroup
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: python3.14
+
+  MeasureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handlers.measure.handler"]
+      MemorySize: 3008
+      Timeout: 900
+      ReservedConcurrentExecutions: !If
+        - CapMeasureConcurrency
+        - !Ref MeasureConcurrencyCap
+        - !Ref AWS::NoValue
+      LoggingConfig:
+        LogGroup: !Ref MeasureLogGroup
+      Policies:
+        - Statement:
+            - Sid: ReadFootprints
+              Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub "${ResultsBucket.Arn}/footprints/*"
+            - Sid: WriteObservations
+              Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub "${ResultsBucket.Arn}/obs/*"
+            - Sid: MissingKeysReadAsNotFound
+              Effect: Allow
+              Action: s3:ListBucket
+              Resource: !GetAtt ResultsBucket.Arn
+            - Sid: StoreObservations
+              Effect: Allow
+              Action: dynamodb:PutItem
+              Resource: !GetAtt ObservationsTable.Arn
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: python3.14
+
+  RouteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handlers.route.handler"]
+      MemorySize: 2048
+      Timeout: 300
+      LoggingConfig:
+        LogGroup: !Ref RouteLogGroup
+      Policies:
+        - Statement:
+            - Sid: CacheChannelGeometry
+              Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource: !Sub "${ResultsBucket.Arn}/terrain/*"
+            - Sid: WriteScenarios
+              Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub "${ResultsBucket.Arn}/scenarios/*"
+            - Sid: MissingKeysReadAsNotFound
+              Effect: Allow
+              Action: s3:ListBucket
+              Resource: !GetAtt ResultsBucket.Arn
+            - Sid: StoreImpacts
+              Effect: Allow
+              Action: dynamodb:PutItem
+              Resource: !GetAtt ObservationsTable.Arn
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: python3.14
+
+  ReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handlers.report.handler"]
+      MemorySize: 512
+      Timeout: 60
+      LoggingConfig:
+        LogGroup: !Ref ReportLogGroup
+      Policies:
+        - Statement:
+            - Sid: ReadOutlines
+              Effect: Allow
+              Action: s3:GetObject
+              Resource:
+                - !Sub "${ResultsBucket.Arn}/obs/*"
+                - !Sub "${ResultsBucket.Arn}/footprints/*"
+            - Sid: WriteFootprintsAndReports
+              Effect: Allow
+              Action: s3:PutObject
+              Resource:
+                - !Sub "${ResultsBucket.Arn}/footprints/*"
+                - !Sub "${ResultsBucket.Arn}/reports/*"
+            - Sid: MissingKeysReadAsNotFound
+              Effect: Allow
+              Action: s3:ListBucket
+              Resource: !GetAtt ResultsBucket.Arn
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: python3.14
+
+  CascadePipeline:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: statemachine/cascade.asl.json
+      DefinitionSubstitutions:
+        PlanFunctionArn: !GetAtt PlanFunction.Arn
+        MeasureFunctionArn: !GetAtt MeasureFunction.Arn
+        RouteFunctionArn: !GetAtt RouteFunction.Arn
+        ReportFunctionArn: !GetAtt ReportFunction.Arn
+      Logging:
+        Level: ERROR
+        IncludeExecutionData: false
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref PlanFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MeasureFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref RouteFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ReportFunction
+        - Statement:
+            # Vended log delivery for Step Functions only accepts "*".
+            - Sid: StateMachineLogDelivery
+              Effect: Allow
+              Action:
+                - logs:CreateLogDelivery
+                - logs:GetLogDelivery
+                - logs:UpdateLogDelivery
+                - logs:DeleteLogDelivery
+                - logs:ListLogDeliveries
+                - logs:PutResourcePolicy
+                - logs:DescribeResourcePolicies
+                - logs:DescribeLogGroups
+              Resource: "*"
+
+  PlanLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cascade/${AWS::StackName}/plan"
+      RetentionInDays: !Ref LogRetentionDays
+
+  MeasureLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cascade/${AWS::StackName}/measure"
+      RetentionInDays: !Ref LogRetentionDays
+
+  RouteLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cascade/${AWS::StackName}/route"
+      RetentionInDays: !Ref LogRetentionDays
+
+  ReportLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cascade/${AWS::StackName}/report"
+      RetentionInDays: !Ref LogRetentionDays
+
+  StateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cascade/${AWS::StackName}/statemachine"
+      RetentionInDays: !Ref LogRetentionDays
+
+Outputs:
+  ResultsBucketName:
+    Value: !Ref ResultsBucket
+  ObservationsTableName:
+    Value: !Ref ObservationsTable
+  PipelineArn:
+    Value: !Ref CascadePipeline
