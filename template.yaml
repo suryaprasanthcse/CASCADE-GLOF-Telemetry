@@ -98,7 +98,8 @@ Resources:
       PackageType: Image
       ImageConfig:
         Command: ["handlers.plan.handler"]
-      MemorySize: 256
+      # Importing the shared geospatial stack filled 256 MB in a local run.
+      MemorySize: 512
       Timeout: 30
       LoggingConfig:
         LogGroup: !Ref PlanLogGroup
