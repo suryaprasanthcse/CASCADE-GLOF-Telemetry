@@ -1,6 +1,14 @@
 # CASCADE architecture brief
 
-**Proposal v1, for team review.** Prepared 8 Oct 2026, day 1 of the event. No code has been written yet.
+**v1 of 8 Oct 2026, day 1 of the event, kept as the plan of record.** It was written before any code; sections marked *As built* record what changed while building.
+
+**Status:**
+- **Built and deployed:**
+  - measurement, routing and validation (sections 2–4);
+  - the AWS pipeline (section 1.4 B), which emails each dossier through SNS;
+  - a $20 budget and a failed-run alarm;
+  - the dam dossier page (section 1.2's web app, drawn with MapLibre alone). The page is served by a Lambda function URL, because CloudFront needs this account to be verified by AWS first.
+- **Not built:** the API, the scheduler, the PDF, the ensemble bands, forecast mode, river burn-in and the asset list (sections 1 and 3).
 
 All code will be written fresh in this repository. The September practice run informs the decisions below, but none of its code is reused.
 

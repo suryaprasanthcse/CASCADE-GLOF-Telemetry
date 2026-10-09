@@ -1,6 +1,78 @@
 # CASCADE: Glacial Lake Outburst Flood Telemetry & Early Warning System
 *Built during WeMakeDevs x AWS Environmental Hacks — Track 02: Heat and Water*
 
+CASCADE tells the people responsible for a dam below a glacial lake how much water an outburst would send them, and how soon. It measures the lake from Sentinel-2 satellite images, routes the flood down the valley, and publishes a dam dossier on AWS. The demo replays the October 2023 South Lhonak flood, which destroyed the Teesta-III dam.
+
+**Dam dossier page:** https://hwpbqzkcdkak5m5xmswijmmmfi0snuis.lambda-url.us-west-2.on.aws/
+
+## The problem
+
+On the night of 3 October 2023, the moraine dam holding South Lhonak Lake in north Sikkim collapsed. Seismic records date the collapse to 22:12 IST. About 50 million m³ of water drained from the lake. Around 00:30 IST it reached the 1,200 MW Teesta-III dam at Chungthang, 67.5 km downstream, and destroyed it.
+
+A dam safety officer below a glacial lake needs two answers before that happens: how much water could come, and how long it takes to arrive.
+
+## What CASCADE does
+
+1. **Measures the lake** from Sentinel-2 imagery, month by month. Cloud, snow, slush and shadow are masked, and the area is reported as a range whenever part of the lake is hidden.
+2. **Traces the flood path** from the lake to the dam on the Copernicus 30 m elevation model.
+3. **Routes the flood** down that path with a mass-conservative, variable-parameter Muskingum–Cunge model.
+4. **Publishes a dam dossier:** arrival time, peak flow, depth and warning time. It is shown on a public page built for the dam officer, with a print-to-PDF version.
+
+The full design, the validation rules and every change made while building are in [docs/architecture-brief.md](docs/architecture-brief.md).
+
+## How it runs on AWS
+
+```mermaid
+flowchart LR
+    subgraph OD["AWS Open Data"]
+        S2["Sentinel-2 L2A COGs<br/>(us-west-2)"]
+        DEM["Copernicus DEM GLO-30<br/>(eu-central-1)"]
+    end
+    STAC["Earth Search STAC API"]
+    subgraph SFN["Step Functions: CascadePipeline"]
+        PLAN["PlanJobs"] --> MEAS["Map: MeasureMonths"] --> ROUTE["Map: RouteFloods"] --> PUB["PublishDossier"]
+    end
+    STAC -.-> MEAS
+    S2 -.->|"windowed reads"| MEAS
+    DEM -.->|"once per lake"| ROUTE
+    MEAS --> S3[("S3 results")]
+    MEAS --> DDB[("DynamoDB")]
+    ROUTE --> S3
+    ROUTE --> DDB
+    PUB --> S3
+    PUB --> SNS["SNS email"]
+    S3 --> URL["Lambda function URL"]
+    SITE[("S3 page files")] --> URL
+    URL --> PAGE["Dam dossier page"]
+```
+
+- **AWS SAM** (open source) defines and deploys everything as one stack in us-west-2. See [template.yaml](template.yaml).
+- **Lambda:** four functions (plan, measure, route, report) run from one container image in **ECR**, with Python 3.14 and rasterio/GDAL.
+- **Step Functions:** a Standard workflow runs them, fanning out one Map item per lake-month.
+- **S3 and DynamoDB** hold the results. **CloudWatch Logs** keeps the logs for 90 days.
+- **A Lambda function URL** serves the dossier page from a private bucket, together with the published results. It can read only those results. CloudFront was the plan, but AWS requires a new account to be verified before it can use CloudFront.
+- **SNS** emails each new dossier. A **$20 AWS Budgets** alert (counting spend before credits) and a **CloudWatch alarm** on failed runs send to the same topic.
+- **IAM:** each function has its own least-privilege role.
+- **Data:** Sentinel-2 images are read window by window in the same region, with no full downloads. The elevation model is read once per lake and cached in S3.
+
+## Results of the 2023 replay
+
+| Check | CASCADE | Published | Note |
+|---|---|---|---|
+| Lake area before the flood (14 Sep 2023) | 164.4 ha | 167.4 ha (ISRO/NRSC) | −1.8% |
+| Flow path, lake to Chungthang | 66.21 km | 67.5 km | −1.9% |
+| Water balance of the routing | exact | | water in equals water out |
+| Flood arrival at Teesta-III | 00:30 IST | about 00:30 IST | Calibrated: Manning's *n* = 0.175 was fitted to this arrival, so it is not an independent test |
+| Peak flow at the dam | 10,541 m³/s | 5,340 m³/s (Sattar et al.); about 7,355 m³/s (*Natural Hazards*, 2025) | 1.4–2× too high |
+| Lake area after the flood (29 Oct 2023) | 1.21–1.46 km² | | A range, because snow and ice hid 14% of the lake |
+
+**How the calibration went:**
+- The pass/fail limits were fixed before the first run: *n* had to land between 0.03 and 0.20.
+- **First run:** formula-based flood sources needed *n* = 0.216, so the test failed, and it was kept as a fail.
+- **Model change:** the source was then switched to Sattar et al.'s published reconstruction of the lake's outflow. The writeup says so.
+
+Details are in [docs/architecture-brief.md §4.5](docs/architecture-brief.md).
+
 ## Cloud performance and determinism: 2023 South Lhonak hindcast on AWS
 
 Raw AWS records and the scripts that rebuild these tables: [`evidence/2026-10-08-batch/`](evidence/2026-10-08-batch/).
@@ -62,6 +134,95 @@ The October high end differs from the local run by 0.0004 km². The first cloud 
 - **One case study.** All of this is one lake and one event, the 2023 South Lhonak flood.
 
 **Cost:** 2,094 GB-s of Lambda time, 300 requests and about 7 state transitions per run comes to **$0.0455 for the 60 runs** ($0.00076 per run) at on-demand prices, inside the AWS free tier.
+
+## Run it yourself
+
+You need Python 3.14, Docker, the AWS SAM CLI and an AWS account. These commands run from the repo root; on Windows, use `.venv\Scripts\python`.
+
+**Test and lint:**
+
+```bash
+python -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pytest
+.venv/bin/cfn-lint template.yaml
+```
+
+**Deploy:** `samconfig.toml` holds the stack settings. Run `sam deploy --guided` the first time, and `sam deploy` after that.
+
+```bash
+sam build
+sam deploy --guided
+```
+
+**Re-run the 2023 replay on AWS:**
+
+```bash
+sam remote invoke CascadePipeline --stack-name cascade-glof --region us-west-2 --event-file events/hindcast-2023.json
+```
+
+**Publish the dossier page:** take the bucket name from the stack output `SiteBucketName`. The page is then live at the `SiteUrl` output.
+
+```bash
+python -m tools.site.make_lake_images --lake south_lhonak --scene S2A_T45RXL_20230914T044830_L2A --scene S2B_T45RXL_20231029T045728_L2A --out web/img
+aws s3 sync web/ s3://SITE_BUCKET/ --delete
+```
+
+**Get the alerts:** subscribe an email address to the stack output `AlertTopicArn`, then click the confirmation email. The address stays out of the repo.
+
+```bash
+aws sns subscribe --topic-arn ALERT_TOPIC_ARN --protocol email --notification-endpoint you@example.com
+```
+
+**Rebuild the benchmark tables from the published evidence:**
+
+```bash
+python -m tools.benchmark.analyze evidence/2026-10-08-batch
+```
+
+This needs only standard Python, with no AWS access.
+
+## Limits
+
+- **Scope:** it's a screening tool, not engineering design. It covers one lake, one dam and one event.
+- **Arrival time:** it is calibrated, and the peak flow runs 1.4–2× above the published reconstructions (see the results table).
+- **Missing physics:** the 30 m elevation model and 1D routing miss valley storage, and the model leaves out sediment and debris. Both likely explain the high peak. It also reaches the ITBP camp, 7 km down the valley, about 5 minutes early.
+- **Warning time** assumes the burst is detected at the lake the moment it happens.
+- **Unverified inputs:** the test that the peak falls inside 5,340–14,673 m³/s leans on an unverified upper bound. The peak-flow formula coefficients, used only for the failed first calibration, are still to be checked against the original papers.
+
+## Credits and licences
+
+**Data**
+- **Sentinel-2:** contains modified Copernicus Sentinel data [2023]. It was read from the Sentinel-2 L2A COGs on the [Registry of Open Data on AWS](https://registry.opendata.aws/sentinel-2-l2a-cogs/), found through Element 84's [Earth Search](https://earth-search.aws.element84.com/v1) STAC API.
+- **Copernicus DEM GLO-30:** produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. It was read from the [Registry of Open Data on AWS](https://registry.opendata.aws/copernicus-dem/).
+- **Map relief on the dossier page:** [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) (Mapzen) on the Registry of Open Data on AWS. For this region:
+  - Global ETOPO1 terrain data U.S. National Oceanic and Atmospheric Administration.
+  - Global GMTED2010 and SRTM terrain data courtesy of the U.S. Geological Survey.
+  - The full list is [here](https://github.com/tilezen/joerd/blob/master/docs/attribution.md).
+
+**Published figures**
+- **Sattar et al. (2025):** "The Sikkim flood of October 2023: drivers, causes and impacts of a multihazard cascade", *Science* 387, doi:10.1126/science.ads2659 (accepted manuscript under CC BY: [White Rose eprint 224098](https://eprints.whiterose.ac.uk/id/eprint/224098)). Used for:
+  - the reconstructed lake outflow (Fig. 3D, digitised by eye);
+  - the release time;
+  - the drained volume;
+  - the Chungthang peak of 5,340 m³/s.
+- **ISRO/NRSC:** the pre-flood lake area of 167.4 ha, as reported by the Deccan Herald.
+- **Global Energy Monitor:** the location of the Teesta-III dam.
+- **D. Petley, *The Landslide Blog* (Eos):** a cross-check of the release time.
+- ***Natural Hazards* (2025), doi:10.1007/s11069-025-07350-9:** about 7,355 m³/s at Chungthang.
+
+**Methods**
+- **Muskingum–Cunge routing:** Ponce's formulation, made mass-conservative following Todini (2007).
+- **Peak-flow formulas:** Huggel et al. (2002), Evans (1986) and Popov (1991).
+
+**Software**
+- The Python libraries in the requirements files, each under its own licence.
+- AWS SAM CLI.
+- [MapLibre GL JS](https://maplibre.org/) 4.7.1 (BSD-3-Clause), which draws the map on the dossier page.
+
+## Licence
+
+The code and documentation in this repository are under the [MIT licence](LICENSE). Data, figures and numbers from others keep their own licences, listed above.
 
 ## AI tools used
 
