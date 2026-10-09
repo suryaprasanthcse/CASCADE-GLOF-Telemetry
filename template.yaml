@@ -2,9 +2,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >-
   CASCADE: glacial lake telemetry and outburst-flood routing. One
-  container image, one Lambda function per pipeline step, and a Standard
-  Step Functions workflow. Deploy to us-west-2, beside the Sentinel-2
-  data.
+  container image, one Lambda function per pipeline step, a Standard
+  Step Functions workflow that emails each dossier, and a dam dossier page.
+  Deploy to us-west-2, beside the Sentinel-2 data.
 
 Parameters:
   MeasureConcurrencyCap:
@@ -19,6 +19,13 @@ Parameters:
     Type: Number
     Default: 14
     AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90]
+  BudgetLimitUsd:
+    Type: Number
+    Default: 20
+    MinValue: 1
+    Description: >-
+      Monthly AWS spend, before credits, that triggers the budget alerts
+      (80% actual, 100% forecast).
 
 Conditions:
   CapMeasureConcurrency: !Not [!Equals [!Ref MeasureConcurrencyCap, 0]]
@@ -74,6 +81,153 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: "false"
+
+  # The dam dossier page: its files sit in a private bucket and a small
+  # function serves them, with the published results, at a function URL.
+  # (CloudFront needs this AWS account to be verified first.)
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !GetAtt SiteBucket.Arn
+              - !Sub "${SiteBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+
+  SiteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Zip
+      Runtime: python3.14
+      CodeUri: site_function/
+      Handler: app.handler
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          SITE_BUCKET: !Ref SiteBucket
+      FunctionUrlConfig:
+        AuthType: NONE
+      LoggingConfig:
+        LogGroup: !Ref SiteLogGroup
+      Policies:
+        - Statement:
+            - Sid: ReadPageFiles
+              Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub "${SiteBucket.Arn}/*"
+            # The dossier, the observed outlines and the flow path only.
+            - Sid: ReadPublishedResults
+              Effect: Allow
+              Action: s3:GetObject
+              Resource:
+                - !Sub "${ResultsBucket.Arn}/reports/*"
+                - !Sub "${ResultsBucket.Arn}/obs/*"
+                - !Sub "${ResultsBucket.Arn}/terrain/*"
+
+  # Alerts: each published dossier, budget warnings and failed runs.
+  # Subscribers are added outside the template, so no address is in git.
+  AlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: CASCADE
+
+  AlertTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref AlertTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: BudgetsAndAlarmsPublish
+            Effect: Allow
+            Principal:
+              Service:
+                - budgets.amazonaws.com
+                - cloudwatch.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref AlertTopic
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
+  # Tracks spend before credits, so the credits themselves are protected.
+  MonthlyBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: !Sub "${AWS::StackName}-monthly"
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: !Ref BudgetLimitUsd
+          Unit: USD
+        CostTypes:
+          IncludeCredit: false
+          IncludeRefund: false
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: SNS
+              Address: !Ref AlertTopic
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: SNS
+              Address: !Ref AlertTopic
+
+  PipelineFailedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: A CascadePipeline execution failed.
+      Namespace: AWS/States
+      MetricName: ExecutionsFailed
+      Dimensions:
+        - Name: StateMachineArn
+          Value: !Ref CascadePipeline
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertTopic
 
   ObservationsTable:
     Type: AWS::DynamoDB::Table
@@ -223,6 +377,8 @@ Resources:
         MeasureFunctionArn: !GetAtt MeasureFunction.Arn
         RouteFunctionArn: !GetAtt RouteFunction.Arn
         ReportFunctionArn: !GetAtt ReportFunction.Arn
+        AlertTopicArn: !Ref AlertTopic
+        SiteUrl: !GetAtt SiteFunctionUrl.FunctionUrl
       Logging:
         Level: ERROR
         IncludeExecutionData: false
@@ -238,6 +394,8 @@ Resources:
             FunctionName: !Ref RouteFunction
         - LambdaInvokePolicy:
             FunctionName: !Ref ReportFunction
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlertTopic.TopicName
         - Statement:
             # Vended log delivery for Step Functions only accepts "*".
             - Sid: StateMachineLogDelivery
@@ -283,6 +441,12 @@ Resources:
       LogGroupName: !Sub "/cascade/${AWS::StackName}/statemachine"
       RetentionInDays: !Ref LogRetentionDays
 
+  SiteLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cascade/${AWS::StackName}/site"
+      RetentionInDays: !Ref LogRetentionDays
+
 Outputs:
   ResultsBucketName:
     Value: !Ref ResultsBucket
@@ -290,3 +454,9 @@ Outputs:
     Value: !Ref ObservationsTable
   PipelineArn:
     Value: !Ref CascadePipeline
+  SiteBucketName:
+    Value: !Ref SiteBucket
+  SiteUrl:
+    Value: !GetAtt SiteFunctionUrl.FunctionUrl
+  AlertTopicArn:
+    Value: !Ref AlertTopic

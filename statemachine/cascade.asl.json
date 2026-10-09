@@ -197,7 +197,55 @@
           "Next": "PipelineFailed"
         }
       ],
+      "Next": "NotifyIfRouted"
+    },
+    "NotifyIfRouted": {
+      "Type": "Choice",
+      "Comment": "A failed route has no summary to send, and a bad path in Parameters would fail the run uncatchably.",
+      "Choices": [
+        {
+          "Variable": "$.routes[0].warning_minutes",
+          "IsPresent": true,
+          "Next": "NotifyDossier"
+        }
+      ],
+      "Default": "Done"
+    },
+    "NotifyDossier": {
+      "Type": "Task",
+      "Comment": "Email the dossier summary. ResultPath null keeps the run's output unchanged.",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${AlertTopicArn}",
+        "Subject.$": "States.Format('CASCADE dossier: {}', $.routes[0].dam_name)",
+        "Message.$": "States.Format('CASCADE published a new dossier for {}.\n\nIf {} bursts, water reaches the dam {} minutes later, peaking at {} m3/s and {} m deep.\nScenario: lake release at {}, water at the dam at {}.\n\nThis is a screening estimate, not a live warning.\nDossier page: ${SiteUrl}', $.routes[0].dam_name, $.routes[0].lake_id, $.routes[0].warning_minutes, $.routes[0].peak_m3s, $.routes[0].depth_m, $.routes[0].release_time, $.routes[0].arrival_time)"
+      },
+      "ResultPath": null,
+      "TimeoutSeconds": 30,
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.notifyError",
+          "Next": "NotifyFailed"
+        }
+      ],
       "End": true
+    },
+    "NotifyFailed": {
+      "Type": "Pass",
+      "Comment": "The dossier is published; only the email failed.",
+      "End": true
+    },
+    "Done": {
+      "Type": "Succeed"
     },
     "PipelineFailed": {
       "Type": "Fail",
