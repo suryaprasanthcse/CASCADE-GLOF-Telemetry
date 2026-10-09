@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Tests
+        run: python -m pytest
+
+      - name: PEP 8
+        run: python -m pycodestyle core/ handlers/ tests/ tools/ site_function/
+
+      - name: Template lint
+        run: cfn-lint template.yaml
+
+      # Checks every published evidence file against MANIFEST.sha256, then
+      # rebuilds the README's benchmark tables from the evidence alone and
+      # fails if any row or figure in the README doesn't match.
+      - name: Rebuild benchmark tables from the published AWS evidence
+        run: python -m tools.benchmark.analyze evidence/2026-10-08-batch --check-readme README.md

@@ -1,6 +1,7 @@
 """Rebuild the README benchmark tables from the published evidence, offline.
 
     python -m tools.benchmark.analyze evidence/2026-10-08-batch
+    python -m tools.benchmark.analyze --check-readme README.md
 
 Standard library only; no AWS access. The script first checks every published
 file against MANIFEST.sha256, then cross-checks the sources against each
@@ -14,7 +15,10 @@ other, then prints the README's tables:
     counts of the same runs and invocations;
   - the runner's own log is the only source for footprint geometry hashes.
 """
+import argparse
+import contextlib
 import hashlib
+import io
 import json
 import math
 import pathlib
@@ -38,6 +42,8 @@ REFERENCE = {"sep": ("2023-09-14", "best", 1.6438, 1.6543),
              "oct": ("2023-10-29", "range", 1.2063, 1.4636),
              "arrival": "00:30:00 IST", "peak_m3s": 10541, "depth_m": 15.9,
              "warning_minutes": 137.7}
+# README lines that carry benchmark figures outside the tables.
+SENTENCES = ("The warm median", "CloudWatch recorded", "**Cost:**")
 FIELD = re.compile(r"(Init Duration|Billed Duration|Duration|Memory Size|"
                    r"Max Memory Used): ([0-9.]+)")
 
@@ -175,8 +181,7 @@ def span(values, places, unit=" s"):
     return f"{low}{unit}" if low == high else f"{low}–{high}{unit}"
 
 
-def main(folder):
-    sys.stdout.reconfigure(encoding="utf-8")  # "→", "²" on Windows consoles
+def report(folder):
     folder = pathlib.Path(folder)
     print(f"Manifest: {verify_manifest(folder)} published files match "
           f"MANIFEST.sha256\n")
@@ -422,5 +427,52 @@ def main(folder):
           f"free tier.")
 
 
+def readme_mismatches(readme, generated):
+    """README benchmark lines that the evidence doesn't reproduce.
+
+    Checks every table row and every figure sentence in the README's
+    "Cloud performance and determinism" section. Table rows must match a
+    generated row exactly. A sentence may run on past the generated one,
+    because the README adds context after the figures.
+    """
+    start = readme.index("## Cloud performance and determinism")
+    end = readme.find("\n## ", start + 1)
+    section = readme[start:end if end > 0 else len(readme)].splitlines()
+    rows = [line for line in section
+            if line.startswith("|") and not line.startswith("|---")]
+    sentences = [line for line in section if line.startswith(SENTENCES)]
+    lines = set(generated)
+    missing = [row for row in rows if row not in lines]
+    missing += [s for s in sentences
+                if not any(s.startswith(g) for g in generated
+                           if g.startswith(SENTENCES))]
+    return len(rows) + len(sentences), missing
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("folder", nargs="?",
+                        default="evidence/2026-10-08-batch")
+    parser.add_argument("--check-readme", metavar="README",
+                        help="fail unless README's benchmark tables and "
+                             "figures match the evidence")
+    args = parser.parse_args()
+    sys.stdout.reconfigure(encoding="utf-8")  # "→", "²" on Windows consoles
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        report(args.folder)
+    print(buffer.getvalue(), end="")
+    if args.check_readme:
+        readme = pathlib.Path(args.check_readme).read_text(encoding="utf-8")
+        checked, missing = readme_mismatches(readme,
+                                             buffer.getvalue().splitlines())
+        print(f"\nREADME check: {checked - len(missing)} of {checked} "
+              "benchmark rows and figures reproduced from the evidence")
+        for line in missing:
+            print(f"  NOT REPRODUCED: {line}")
+        if missing:
+            sys.exit(1)
+
+
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "evidence/2026-10-08-batch")
+    main()

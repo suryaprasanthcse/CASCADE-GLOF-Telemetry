@@ -1,6 +1,8 @@
 # CASCADE: Glacial Lake Outburst Flood Telemetry & Early Warning System
 *Built during WeMakeDevs x AWS Environmental Hacks — Track 02: Heat and Water*
 
+[![CI](https://github.com/suryaprasanthcse/CASCADE-GLOF-Telemetry/actions/workflows/ci.yml/badge.svg)](https://github.com/suryaprasanthcse/CASCADE-GLOF-Telemetry/actions/workflows/ci.yml)
+
 CASCADE tells the people responsible for a dam below a glacial lake how much water an outburst would send them, and how soon. It measures the lake from Sentinel-2 satellite images, routes the flood down the valley, and publishes a dam dossier on AWS. The demo replays the October 2023 South Lhonak flood, which destroyed the Teesta-III dam.
 
 **Dam dossier page:** https://hwpbqzkcdkak5m5xmswijmmmfi0snuis.lambda-url.us-west-2.on.aws/
@@ -177,10 +179,15 @@ aws sns subscribe --topic-arn ALERT_TOPIC_ARN --protocol email --notification-en
 **Rebuild the benchmark tables from the published evidence:**
 
 ```bash
-python -m tools.benchmark.analyze evidence/2026-10-08-batch
+python -m tools.benchmark.analyze evidence/2026-10-08-batch --check-readme README.md
 ```
 
 This needs only standard Python, with no AWS access.
+- It checks every evidence file against its manifest.
+- It rebuilds the tables.
+- With `--check-readme`, it fails if any README row or figure doesn't match.
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs this on every push, together with the tests, the PEP 8 check and the template lint.
 
 ## Limits
 
