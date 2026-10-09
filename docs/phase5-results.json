@@ -1,0 +1,779 @@
+{
+ "run_at": "2026-10-09T20:07:22.138371+00:00",
+ "code": "2c46dd2",
+ "forecast": {
+  "members": [
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 34874572.265022606,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 7159.162298107984,
+    "dam_peak_m3s": 5104.995701101516,
+    "travel_min": 176.40790818434215,
+    "depth_m": 11.402523632022216,
+    "water_balance": 0.9997448475486529
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 34874572.265022606,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 7159.162298107984,
+    "dam_peak_m3s": 5627.226243942136,
+    "travel_min": 190.00959663186768,
+    "depth_m": 11.936096407577496,
+    "water_balance": 0.9997369189591563
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 34874572.265022606,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 27499.778929754415,
+    "dam_peak_m3s": 9831.045303387536,
+    "travel_min": 126.2763555900026,
+    "depth_m": 15.392979831832664,
+    "water_balance": 0.9999947436150366
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 34874572.265022606,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 27499.778929754415,
+    "dam_peak_m3s": 10142.610490754198,
+    "travel_min": 128.40068169364676,
+    "depth_m": 15.612825433982438,
+    "water_balance": 0.9999946489577848
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52311858.39753391,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 8875.453955369807,
+    "dam_peak_m3s": 6682.698363434466,
+    "travel_min": 166.55278705233886,
+    "depth_m": 12.912760485376012,
+    "water_balance": 0.9995621092562788
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52311858.39753391,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 8875.453955369807,
+    "dam_peak_m3s": 7217.823866736662,
+    "travel_min": 182.69556917325525,
+    "depth_m": 13.370291644695582,
+    "water_balance": 0.999549894501557
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52311858.39753391,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 39546.4014448914,
+    "dam_peak_m3s": 17305.141584093362,
+    "travel_min": 113.33892523277588,
+    "depth_m": 19.97824710618843,
+    "water_balance": 0.9999961403021932
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52311858.39753391,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 39546.4014448914,
+    "dam_peak_m3s": 18238.059465492286,
+    "travel_min": 115.93315719845803,
+    "depth_m": 20.464975042998184,
+    "water_balance": 0.9999960801444985
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 69749144.53004521,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 10337.323457722043,
+    "dam_peak_m3s": 8227.988862573995,
+    "travel_min": 158.64727133802324,
+    "depth_m": 14.200000222646604,
+    "water_balance": 0.9993422953105872
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 69749144.53004521,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 10337.323457722043,
+    "dam_peak_m3s": 9347.001847261266,
+    "travel_min": 179.01548355280053,
+    "depth_m": 15.051430681306082,
+    "water_balance": 0.9993244231649447
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 69749144.53004521,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 51174.31978419718,
+    "dam_peak_m3s": 21784.802510659123,
+    "travel_min": 103.85348784714952,
+    "depth_m": 22.231125905114048,
+    "water_balance": 0.9999969017618354
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 69749144.53004521,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 51174.31978419718,
+    "dam_peak_m3s": 23025.79606242962,
+    "travel_min": 106.37386396414556,
+    "depth_m": 22.814644287509225,
+    "water_balance": 0.9999968587180535
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51185142.17759705,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 8773.618997405341,
+    "dam_peak_m3s": 6599.2948980196325,
+    "travel_min": 167.15825628158203,
+    "depth_m": 12.836090808181098,
+    "water_balance": 0.9995748009737568
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51185142.17759705,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 8773.618997405341,
+    "dam_peak_m3s": 7120.328104720762,
+    "travel_min": 183.1074335590691,
+    "depth_m": 13.288283673761756,
+    "water_balance": 0.9995628619652982
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51185142.17759705,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 38782.35561363903,
+    "dam_peak_m3s": 16445.627971054524,
+    "travel_min": 113.7827653517883,
+    "depth_m": 19.50268707494559,
+    "water_balance": 0.9999960764589751
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51185142.17759705,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 38782.35561363903,
+    "dam_peak_m3s": 17425.361963559764,
+    "travel_min": 116.39285066220219,
+    "depth_m": 20.042097834273783,
+    "water_balance": 0.9999960153258634
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 76777713.26639558,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 10876.950150160486,
+    "dam_peak_m3s": 9136.19752795283,
+    "travel_min": 156.95557407020107,
+    "depth_m": 14.894531407934561,
+    "water_balance": 0.9992358222747283
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 76777713.26639558,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 10876.950150160486,
+    "dam_peak_m3s": 9934.201968380392,
+    "travel_min": 178.45537083295204,
+    "depth_m": 15.465768898296716,
+    "water_balance": 0.9992150173265877
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 76777713.26639558,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 55771.45212669546,
+    "dam_peak_m3s": 24524.533240039997,
+    "travel_min": 100.79351952194864,
+    "depth_m": 23.496859668938125,
+    "water_balance": 0.9999971203569176
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 76777713.26639558,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 55771.45212669546,
+    "dam_peak_m3s": 25440.528568446687,
+    "travel_min": 103.39500395862001,
+    "depth_m": 23.90890805202213,
+    "water_balance": 0.9999970832017432
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 102370284.3551941,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 12668.484620744382,
+    "dam_peak_m3s": 10950.236886870818,
+    "travel_min": 152.2266793815502,
+    "depth_m": 16.170427107994108,
+    "water_balance": 0.9987907159372357
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 102370284.3551941,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 12668.484620744382,
+    "dam_peak_m3s": 11743.659708299256,
+    "travel_min": 177.04826695401368,
+    "depth_m": 16.692671038298304,
+    "water_balance": 0.9987614877962292
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 102370284.3551941,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 72170.05901125411,
+    "dam_peak_m3s": 37180.4896077964,
+    "travel_min": 93.19822600168699,
+    "depth_m": 28.631631981287672,
+    "water_balance": 0.9999976896078633
+   },
+   {
+    "area_km2": 1.6438,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 102370284.3551941,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 72170.05901125411,
+    "dam_peak_m3s": 38706.57566965831,
+    "travel_min": 96.26916977886677,
+    "depth_m": 29.18624595036346,
+    "water_balance": 0.9999976617340388
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 35191324.00877174,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 7193.551679210243,
+    "dam_peak_m3s": 5147.126727976902,
+    "travel_min": 176.17129776253387,
+    "depth_m": 11.44556969521227,
+    "water_balance": 0.9997419741497992
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 35191324.00877174,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 7193.551679210243,
+    "dam_peak_m3s": 5674.119455615212,
+    "travel_min": 189.91849130585427,
+    "depth_m": 11.98400808461386,
+    "water_balance": 0.999733948347615
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 35191324.00877174,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 27723.467017019884,
+    "dam_peak_m3s": 9967.478049349986,
+    "travel_min": 125.97913109145652,
+    "depth_m": 15.48924905703902,
+    "water_balance": 0.9999947806450024
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.5,
+    "volume_m3": 35191324.00877174,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 27723.467017019884,
+    "dam_peak_m3s": 10256.994489182769,
+    "travel_min": 128.0236935381939,
+    "depth_m": 15.693536694516288,
+    "water_balance": 0.9999946864467197
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52786986.013157606,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 8918.0876261566,
+    "dam_peak_m3s": 6719.250292930884,
+    "travel_min": 166.29254343060447,
+    "depth_m": 12.946361303056703,
+    "water_balance": 0.9995566703066606
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52786986.013157606,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 8918.0876261566,
+    "dam_peak_m3s": 7258.133756805604,
+    "travel_min": 182.48893797393285,
+    "depth_m": 13.404198065085222,
+    "water_balance": 0.9995443363143347
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52786986.013157606,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 39868.07889982792,
+    "dam_peak_m3s": 17109.568723636727,
+    "travel_min": 113.08634590944801,
+    "depth_m": 19.870038656411605,
+    "water_balance": 0.9999961669720465
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 0.75,
+    "volume_m3": 52786986.013157606,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 39868.07889982792,
+    "dam_peak_m3s": 18116.869743711548,
+    "travel_min": 115.39057497352172,
+    "depth_m": 20.401915452989773,
+    "water_balance": 0.9999961072410744
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 70382648.01754348,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 10386.979289111547,
+    "dam_peak_m3s": 8308.376318636778,
+    "travel_min": 158.44714922387155,
+    "depth_m": 14.261474636258678,
+    "water_balance": 0.9993331779628605
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 70382648.01754348,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 10386.979289111547,
+    "dam_peak_m3s": 9404.123008823106,
+    "travel_min": 178.9751573724042,
+    "depth_m": 15.091736327341815,
+    "water_balance": 0.9993150465099416
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 70382648.01754348,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 51590.58079265398,
+    "dam_peak_m3s": 21958.250280594562,
+    "travel_min": 103.55310322829463,
+    "depth_m": 22.31268149579249,
+    "water_balance": 0.9999969226066608
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "huggel_2002",
+    "drained_fraction": 1.0,
+    "volume_m3": 70382648.01754348,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 51590.58079265398,
+    "dam_peak_m3s": 23288.696870435495,
+    "travel_min": 106.05925589000022,
+    "depth_m": 22.938260928384683,
+    "water_balance": 0.9999968807649853
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51594158.20314417,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 8810.707382312223,
+    "dam_peak_m3s": 6628.106083288752,
+    "travel_min": 166.9581179572946,
+    "depth_m": 12.862575850057947,
+    "water_balance": 0.999570209217853
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51594158.20314417,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 8810.707382312223,
+    "dam_peak_m3s": 7156.5088391873405,
+    "travel_min": 182.93713851464537,
+    "depth_m": 13.318716879873994,
+    "water_balance": 0.9995581782267001
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51594158.20314417,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 39059.91673550179,
+    "dam_peak_m3s": 16849.140957932734,
+    "travel_min": 113.6935457641018,
+    "depth_m": 19.725946655405572,
+    "water_balance": 0.9999961001182313
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.5,
+    "volume_m3": 51594158.20314417,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 39059.91673550179,
+    "dam_peak_m3s": 17708.084871830793,
+    "travel_min": 116.25934077273706,
+    "depth_m": 20.189209242894826,
+    "water_balance": 0.9999960390785892
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 77391237.30471626,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 10922.92986661517,
+    "dam_peak_m3s": 9191.104663079861,
+    "travel_min": 156.77956340253982,
+    "depth_m": 14.936520346263658,
+    "water_balance": 0.9992260487935861
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 77391237.30471626,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 10922.92986661517,
+    "dam_peak_m3s": 9989.20835029411,
+    "travel_min": 178.42895785000124,
+    "depth_m": 15.504582320476873,
+    "water_balance": 0.9992050012468131
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 77391237.30471626,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 56170.60237363809,
+    "dam_peak_m3s": 24671.01416867128,
+    "travel_min": 100.57273590184258,
+    "depth_m": 23.5627521772549,
+    "water_balance": 0.9999971375202081
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 0.75,
+    "volume_m3": 77391237.30471626,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 56170.60237363809,
+    "dam_peak_m3s": 25812.335496173175,
+    "travel_min": 103.17128198553823,
+    "depth_m": 24.0730905390885,
+    "water_balance": 0.9999971008597283
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 103188316.40628834,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 12722.037622526204,
+    "dam_peak_m3s": 11001.440314265588,
+    "travel_min": 152.06898408404774,
+    "depth_m": 16.20413004474547,
+    "water_balance": 0.9987759850575741
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 103188316.40628834,
+    "peak_formula": "evans_1986",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 12722.037622526204,
+    "dam_peak_m3s": 11804.351863300972,
+    "travel_min": 177.01347953378624,
+    "depth_m": 16.73261961138026,
+    "water_balance": 0.99874655433137
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 103188316.40628834,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.1,
+    "source_peak_m3s": 72686.57231291184,
+    "dam_peak_m3s": 37307.669523182514,
+    "travel_min": 93.03577694670989,
+    "depth_m": 28.678554913469682,
+    "water_balance": 0.9999977036687102
+   },
+   {
+    "area_km2": 1.6543,
+    "volume_relation": "fujita_2013",
+    "drained_fraction": 1.0,
+    "volume_m3": 103188316.40628834,
+    "peak_formula": "popov_1991",
+    "rise_fraction": 0.3,
+    "source_peak_m3s": 72686.57231291184,
+    "dam_peak_m3s": 38888.42387243878,
+    "travel_min": 96.0000494895589,
+    "depth_m": 29.250431984019336,
+    "water_balance": 0.9999976758945551
+   }
+  ],
+  "bands": {
+   "volume_m3": {
+    "min": 34874572.265022606,
+    "p10": 35191324.00877174,
+    "p50": 61268065.27160141,
+    "p90": 102370284.3551941,
+    "max": 103188316.40628834
+   },
+   "source_peak_m3s": {
+    "min": 7159.162298107984,
+    "p10": 8773.618997405341,
+    "p50": 20110.90827614031,
+    "p90": 56170.60237363809,
+    "max": 72686.57231291184
+   },
+   "dam_peak_m3s": {
+    "min": 5104.995701101516,
+    "p10": 6619.462727708016,
+    "p50": 10603.615688026794,
+    "p90": 25552.070646764634,
+    "max": 38888.42387243878
+   },
+   "travel_min": {
+    "min": 93.03577694670989,
+    "p10": 100.72728443591681,
+    "p50": 140.23483288884725,
+    "p90": 182.55092733372956,
+    "max": 190.00959663186768
+   },
+   "depth_m": {
+    "min": 11.402523632022216,
+    "p10": 12.854630337494893,
+    "p50": 15.931981901255199,
+    "p90": 23.95816279814204,
+    "max": 29.250431984019336
+   }
+  },
+  "checks": {
+   "F1": {
+    "rule": "drained-volume band (min-max) contains 50 million m3",
+    "passed": true
+   },
+   "F2": {
+    "rule": "p10-p90 dam peak overlaps 5,340-7,355 m3/s",
+    "passed": true
+   },
+   "F3": {
+    "rule": "p10-p90 travel time overlaps 137.7 +/- 10 min (not independent: n was calibrated on it)",
+    "passed": true
+   }
+  }
+ },
+ "band": {
+  "n_minus": 0.15856061167114657,
+  "n_plus": 0.19260518253525427,
+  "members": [
+   {
+    "volume_m3": 48200000.0,
+    "manning_n": 0.15856061167114657,
+    "dam_peak_m3s": 10599.814126334319,
+    "travel_min": 127.62214153180584,
+    "depth_m": 15.23282533555917
+   },
+   {
+    "volume_m3": 48200000.0,
+    "manning_n": 0.175,
+    "dam_peak_m3s": 10520.132195225207,
+    "travel_min": 137.66991333032382,
+    "depth_m": 15.879211056668728
+   },
+   {
+    "volume_m3": 48200000.0,
+    "manning_n": 0.19260518253525427,
+    "dam_peak_m3s": 10354.254233352925,
+    "travel_min": 147.6781880074326,
+    "depth_m": 16.463771868324255
+   },
+   {
+    "volume_m3": 50000000.0,
+    "manning_n": 0.15856061167114657,
+    "dam_peak_m3s": 10604.75389846531,
+    "travel_min": 127.62250594120707,
+    "depth_m": 15.235983487611932
+   },
+   {
+    "volume_m3": 50000000.0,
+    "manning_n": 0.175,
+    "dam_peak_m3s": 10540.969523001006,
+    "travel_min": 137.6710229279891,
+    "depth_m": 15.893914223318317
+   },
+   {
+    "volume_m3": 50000000.0,
+    "manning_n": 0.19260518253525427,
+    "dam_peak_m3s": 10414.359550514124,
+    "travel_min": 147.68050947440625,
+    "depth_m": 16.507314184430516
+   },
+   {
+    "volume_m3": 51800000.0,
+    "manning_n": 0.15856061167114657,
+    "dam_peak_m3s": 10605.672412545242,
+    "travel_min": 127.62257328705688,
+    "depth_m": 15.236570722619968
+   },
+   {
+    "volume_m3": 51800000.0,
+    "manning_n": 0.175,
+    "dam_peak_m3s": 10552.728670969822,
+    "travel_min": 137.67163719750897,
+    "depth_m": 15.90221167460876
+   },
+   {
+    "volume_m3": 51800000.0,
+    "manning_n": 0.19260518253525427,
+    "dam_peak_m3s": 10455.382775137987,
+    "travel_min": 147.6825147483284,
+    "depth_m": 16.53703279001544
+   }
+  ],
+  "stats": {
+   "dam_peak_m3s": {
+    "min": 10354.254233352925,
+    "median": 10540.969523001006,
+    "max": 10605.672412545242
+   },
+   "travel_min": {
+    "min": 127.62214153180584,
+    "median": 137.6710229279891,
+    "max": 147.6825147483284
+   },
+   "depth_m": {
+    "min": 15.23282533555917,
+    "median": 15.893914223318317,
+    "max": 16.53703279001544
+   }
+  },
+  "checks": {
+   "B0": {
+    "rule": "the 50 million m3, n = 0.175 member reproduces 10,541 m3/s, 137.7 min and 15.9 m",
+    "passed": true
+   },
+   "B1": {
+    "rule": "dam peak band (min-max) overlaps 5,340-7,355 m3/s",
+    "passed": false
+   }
+  }
+ }
+}

@@ -33,7 +33,7 @@
 | 1:57–2:07 | CloudWatch Logs REPORT lines, then the S3 `reports/` object and the DynamoDB items | "Every call is logged in CloudWatch. Results land in S3 and DynamoDB." |
 | 2:07–2:15 | The SNS email arriving in the inbox | "Each new dossier is emailed through Amazon SNS. A budget alert and a failed-run alarm go to the same topic." |
 | 2:15–2:22 | GitHub: the `evidence/` folder and the green CI check | "The raw AWS records behind every number are in the repo, and CI rebuilds the tables from them." |
-| 2:22–2:40 | README "Results of the 2023 replay" table, then the forecast replay table from Phase 5 | "We tested it against the real 2023 flood. The lake area is within 2%, and so is the flow path. The arrival time was calibrated, and our peak runs high, so this is a screening tool, not a design." *(Add one line on the forecast replay once Phase 5 lands.)* |
+| 2:22–2:40 | README "Results of the 2023 replay" table, then the forecast replay table from Phase 5 | "We tested it against the real 2023 flood. The lake area is within 2%, and so is the flow path. Three weeks before the burst, CASCADE's own measurement would have forecast 6,600 to 25,600 cubic metres a second at the dam, arriving in 101 to 183 minutes. The real arrival, 138 minutes, falls inside that window. The arrival was calibrated, though, and our peak runs high, so this is a screening tool, not a design." |
 | 2:40–2:50 | End card: the page URL and the repo URL | "CASCADE: glacial lake flood screening on AWS, built with Claude Code. Thanks for watching." |
 
 ## If it runs long

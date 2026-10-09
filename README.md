@@ -75,6 +75,25 @@ flowchart LR
 
 Details are in [docs/architecture-brief.md §4.5](docs/architecture-brief.md).
 
+## What CASCADE would have said three weeks earlier
+
+The inputs and pass/fail checks for both runs were fixed and committed (`2c46dd2`) before either one ran: see [docs/phase5-preregistration.md](docs/phase5-preregistration.md). The full results, with every member, are in [docs/phase5-results.md](docs/phase5-results.md).
+
+**Forecast replay**
+- **Inputs:** only the lake area CASCADE measured on 14 Sep 2023, with no knowledge of the event. Published area–volume and breach formulas turn that area into 48 possible floods.
+- **The forecast:** **6,600–25,600 m³/s at Teesta-III, arriving 101–183 minutes after a burst** (p10–p90).
+- **Against what happened:**
+  - The published peaks at Chungthang (5,340 and about 7,355 m³/s) sit at the low end of that band.
+  - The real travel time, 137.7 minutes, falls inside it.
+- **Checks:** all three pre-registered checks pass. The timing check isn't independent, because Manning's *n* was calibrated on that arrival.
+- **Why the band is wide:** mostly because the published breach formulas disagree. Popov's (1991) peaks run 2–3 times Evans' (1986).
+
+**Hindcast band**
+- **Inputs varied:** the drained volume (50 ± 1.8 million m³) and Manning's *n*, across the calibration's own ±10-minute tolerance.
+- **The result:** the hindcast peak at the dam moves only from 10,354 to 10,606 m³/s.
+- **Check B1 fails:** the band doesn't reach the published 5,340–7,355 m³/s. Uncertainty in these inputs doesn't explain why our peak runs 1.4–2 times higher.
+- **The likely cause is structural** (see [Limits](#limits)): the valley storage and sediment that the 30 m elevation model and 1D routing leave out.
+
 ## Cloud performance and determinism: 2023 South Lhonak hindcast on AWS
 
 Raw AWS records and the scripts that rebuild these tables: [`evidence/2026-10-08-batch/`](evidence/2026-10-08-batch/).
