@@ -1,0 +1,100 @@
+:root {
+  --ink: #1b1f24;
+  --muted: #56606b;
+  --paper: #f5f3ee;
+  --card: #ffffff;
+  --line: #dcd8cf;
+  --water: #1d6fb8;
+  --flood: #c2410c;
+  --notice: #fff3e0;
+  --notice-line: #f0b357;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+h1, h2 { line-height: 1.2; margin: 0 0 8px; }
+h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); }
+h2 { font-size: 1.25rem; }
+a { color: var(--water); }
+
+.masthead { background: var(--card); border-bottom: 1px solid var(--line); padding: 24px 0 20px; }
+.eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.for-whom { margin: 0 0 12px; color: var(--muted); }
+.notice { margin: 0 0 16px; padding: 10px 14px; background: var(--notice); border-left: 4px solid var(--notice-line); border-radius: 4px; }
+
+.print-button, .date-switch button {
+  font: inherit; cursor: pointer; border-radius: 6px; min-height: 44px; padding: 8px 16px;
+}
+.print-button { background: var(--ink); color: #fff; border: 0; }
+.print-button:focus-visible, .date-switch button:focus-visible { outline: 3px solid var(--water); outline-offset: 2px; }
+
+main { padding-top: 20px; padding-bottom: 8px; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.hint { color: var(--muted); margin: 0 0 14px; }
+
+.answer { border-top: 6px solid var(--flood); }
+.headline { font-size: clamp(1.15rem, 3vw, 1.45rem); font-weight: 600; margin: 4px 0 16px; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 12px; }
+.fact { background: var(--paper); border-radius: 8px; padding: 12px 14px; }
+.fact dt { color: var(--muted); font-size: 0.9rem; }
+.fact dd { margin: 2px 0 0; font-size: 1.5rem; font-weight: 700; }
+.fact .note { display: block; font-size: 0.9rem; font-weight: 400; color: var(--muted); }
+.timeline { margin: 0; color: var(--muted); }
+
+.observations { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.observations li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; }
+.observations .area { font-weight: 700; font-size: 1.1rem; }
+.observations .status { color: var(--muted); width: 100%; }
+
+.date-switch { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.date-switch button { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
+.date-switch button[aria-pressed="true"] { background: var(--water); color: #fff; border-color: var(--water); }
+.map { height: 440px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.map-label { background: rgba(255, 255, 255, 0.92); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.map-label.dam { border-color: var(--flood); }
+
+.images { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.images figure { margin: 0; }
+.images img { width: 100%; height: auto; display: block; border-radius: 6px; border: 1px solid var(--line); }
+.images figcaption { margin-top: 6px; color: var(--muted); font-size: 0.95rem; }
+
+.plain { margin: 0; padding-left: 20px; }
+.plain li { margin-bottom: 8px; }
+.limits { border-left: 6px solid var(--notice-line); }
+
+.footer { border-top: 1px solid var(--line); padding: 16px 0 32px; color: var(--muted); font-size: 0.9rem; }
+.credits { font-size: 0.8rem; }
+
+.error { color: var(--flood); }
+
+@media (max-width: 640px) {
+  .facts, .images { grid-template-columns: minmax(0, 1fr); }
+  .map { height: 60vh; max-height: 420px; }
+  .card { padding: 16px; }
+}
+
+@media print {
+  @page { margin: 12mm; }
+  body { background: #fff; font-size: 11pt; }
+  .print-button, .map-card { display: none; }
+  .masthead { padding: 0 0 8px; border: 0; }
+  .card { border: 1px solid #999; break-inside: avoid; padding: 10px 12px; margin-bottom: 8px; }
+  .facts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .fact dd { font-size: 1.2rem; }
+  .images { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .images img { max-height: 55mm; width: auto; }
+  .footer { border: 0; padding: 0; }
+  a { color: inherit; }
+}

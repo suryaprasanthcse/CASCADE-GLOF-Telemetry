@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teesta-III flood dossier · CASCADE</title>
+  <meta name="description" content="How much water a glacial lake outburst would send to the Teesta-III dam, and when. A replay of the October 2023 South Lhonak flood, computed on AWS.">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <p class="eyebrow">CASCADE · glacial lake flood screening</p>
+      <h1 id="dam-name">Teesta-III dam, Chungthang</h1>
+      <p class="for-whom">For the people responsible for the dam and the valley below it.</p>
+      <p class="notice"><strong>Replay, not a live warning.</strong> These numbers re-run the South Lhonak Lake outburst of 3–4 October 2023, the flood that destroyed this dam.</p>
+      <button id="print-button" class="print-button" type="button">Print or save as PDF</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card answer" aria-labelledby="answer-title">
+      <h2 id="answer-title">If the lake bursts</h2>
+      <p class="headline" id="headline" aria-live="polite">Loading the latest dossier…</p>
+      <dl class="facts" id="facts"></dl>
+      <p class="timeline" id="timeline"></p>
+    </section>
+
+    <section class="card" aria-labelledby="lake-title">
+      <h2 id="lake-title">The lake, month by month</h2>
+      <p class="hint">Satellite measurements of the lake's surface. When snow, ice, cloud or shadow hide part of it, we give a range instead of one number.</p>
+      <ul class="observations" id="observations"></ul>
+    </section>
+
+    <section class="card map-card" aria-labelledby="map-title">
+      <h2 id="map-title">Where the water goes</h2>
+      <p class="hint">The red line is the path the flood takes down the valley from the lake to the dam. Choose a date to see the lake on that day.</p>
+      <div class="date-switch" id="date-switch" role="group" aria-label="Show the lake on"></div>
+      <div id="map" class="map" role="img" aria-label="Map of the flood path from South Lhonak Lake to the Teesta-III dam"></div>
+    </section>
+
+    <section class="card" aria-labelledby="images-title">
+      <h2 id="images-title">The lake from space</h2>
+      <div class="images" id="images"></div>
+    </section>
+
+    <section class="card" aria-labelledby="read-title">
+      <h2 id="read-title">How to read this</h2>
+      <ul class="plain">
+        <li><strong>Time to act</strong> is how long the water takes to travel from the lake to the dam. It is the time you have to warn and move people, if the burst is noticed the moment it happens.</li>
+        <li><strong>Peak flow</strong> is the most water passing the dam in one second, in cubic metres (m³/s). It arrives after the first water, so the flood keeps rising for a while.</li>
+        <li><strong>Depth</strong> is how deep the water runs in the valley at the dam at the peak.</li>
+        <li>The lake's <strong>area</strong> tells you how much water it holds: a bigger lake can release more.</li>
+      </ul>
+    </section>
+
+    <section class="card limits" aria-labelledby="limits-title">
+      <h2 id="limits-title">What this can't tell you</h2>
+      <ul class="plain">
+        <li>It replays one past flood from one lake to one dam. It is a screening tool, not an engineering design or a forecast.</li>
+        <li>The arrival time matches the record because the model's channel roughness was tuned to it, so it is not an independent check.</li>
+        <li>The peak flow is about 1.4–2 times the published reconstructions (5,340 and about 7,355 m³/s). Treat it as a high-end value.</li>
+        <li>The time to act assumes the burst is detected at the lake the moment it happens.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p id="generated"></p>
+      <p>Computed by the CASCADE pipeline on AWS: AWS Step Functions and AWS Lambda, with results in Amazon S3, served by an AWS Lambda function URL. Code, evidence and method: <a href="https://github.com/suryaprasanthcse/CASCADE-GLOF-Telemetry">github.com/suryaprasanthcse/CASCADE-GLOF-Telemetry</a>.</p>
+      <p class="credits">Contains modified Copernicus Sentinel data [2023]. Flow path produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. Map relief: Terrain Tiles (Mapzen, Registry of Open Data on AWS); SRTM and GMTED2010 data courtesy of the U.S. Geological Survey, ETOPO1 from NOAA. Lake outflow for the 2023 replay: Sattar et al. (2025), <i>Science</i> 387, doi:10.1126/science.ads2659 (CC BY). Map rendering: MapLibre GL JS (BSD-3-Clause).</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
