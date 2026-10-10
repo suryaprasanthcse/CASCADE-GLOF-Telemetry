@@ -203,7 +203,7 @@ Each pixel in the lake's search zone (the footprint *F* from 2.3, dilated by 300
 | M4 | The practice result for Oct 29, 2023 (1.296 km²) falls inside the measured range [`A_low`, `A_high`] |
 | M5 | The offset guard triggers on a synthetic window with +1000 DN |
 
-**M4 revised on 8 Oct (team decision).** The original criterion, `A_low` within ±3% of 1.296 km², assumed the practice run was a reference. It isn't ground truth: it had no near-infrared test and counted sediment-laden margin pixels as water. Under the revised criterion, Oct 29 passes: 1.296 km² falls inside the measured range of 1.206–1.464 km².
+**M4 revised on 8 Oct.** The original criterion, `A_low` within ±3% of 1.296 km², assumed the practice run was a reference. It isn't ground truth: it had no near-infrared test and counted sediment-laden margin pixels as water. Under the revised criterion, Oct 29 passes: 1.296 km² falls inside the measured range of 1.206–1.464 km².
 
 Test fixtures are stored as small `.npy` or `.json` files under `tests/fixtures/`, because `.gitignore` excludes `*.tif` and `data/`.
 
@@ -313,7 +313,7 @@ $$C=\frac{c\,\Delta t}{\Delta x}\ \text{(Courant number)},\qquad D=\frac{Q}{B\,S
 
 ### 4.2 Ground-truth register
 
-The team locked four values as the official Day 1 constants on 8 Oct.
+Four values were locked as the official Day 1 constants on 8 Oct.
 
 | Quantity | Value | Claimed source | Status |
 |---|---|---|---|
@@ -418,10 +418,12 @@ Re-run with the volume estimated from our own Sep 2023 area instead of the publi
 
 ---
 
-## 7. Decisions needed from the team
+## 7. Decisions, as settled
 
-1. **Scope:** South Lhonak → Teesta-III only for the demo, with other lakes as a stretch goal? *(Recommended.)*
-2. **Infrastructure as code:** SAM *(recommended: open source and on the hackathon list)* or CDK?
-3. **Frontend:** plain JS with MapLibre and deck.gl *(recommended, no framework build)* or React?
-4. **AWS account:** whose account do we use, and who sets up the budget alert?
-5. **Roles:** who owns measurement, routing, AWS and infrastructure, and the frontend and story?
+This is a solo entry by Surya Prasanth R. Version 1 of this section listed these as open questions.
+
+1. **Scope:** South Lhonak → Teesta-III only. Other lakes remain a stretch goal.
+2. **Infrastructure as code:** AWS SAM, which is open source and on the hackathon list.
+3. **Frontend:** plain JS with MapLibre, with no framework build. deck.gl was dropped because the animated flood front was out of scope.
+4. **AWS account:** my own. A $20 budget alert was added on 10 Oct.
+5. **Roles:** none to assign. I built every part.

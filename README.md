@@ -1,11 +1,13 @@
 # CASCADE: Glacial Lake Outburst Flood Telemetry & Early Warning System
-*Built during WeMakeDevs x AWS Environmental Hacks — Track 02: Heat and Water*
+*Built solo by Surya Prasanth R during WeMakeDevs x AWS Environmental Hacks — Track 02: Heat and Water*
 
 [![CI](https://github.com/suryaprasanthcse/CASCADE-GLOF-Telemetry/actions/workflows/ci.yml/badge.svg)](https://github.com/suryaprasanthcse/CASCADE-GLOF-Telemetry/actions/workflows/ci.yml)
 
 CASCADE tells the people responsible for a dam below a glacial lake how much water an outburst would send them, and how soon. It measures the lake from Sentinel-2 satellite images, routes the flood down the valley, and publishes a dam dossier on AWS. The demo replays the October 2023 South Lhonak flood, which destroyed the Teesta-III dam.
 
 **Dam dossier page:** https://hwpbqzkcdkak5m5xmswijmmmfi0snuis.lambda-url.us-west-2.on.aws/
+
+**Demo video (2:34):** https://www.youtube.com/watch?v=Etn87cKBptw
 
 ## The problem
 
@@ -91,7 +93,7 @@ The inputs and pass/fail checks for both runs were fixed and committed (`2c46dd2
 **Hindcast band**
 - **Inputs varied:** the drained volume (50 ± 1.8 million m³) and Manning's *n*, across the calibration's own ±10-minute tolerance.
 - **The result:** the hindcast peak at the dam moves only from 10,354 to 10,606 m³/s.
-- **Check B1 fails:** the band doesn't reach the published 5,340–7,355 m³/s. Uncertainty in these inputs doesn't explain why our peak runs 1.4–2 times higher.
+- **Check B1 fails:** the band doesn't reach the published 5,340–7,355 m³/s. Uncertainty in these inputs doesn't explain why the model's peak runs 1.4–2 times higher.
 - **The likely cause is structural** (see [Limits](#limits)): the valley storage and sediment that the 30 m elevation model and 1D routing leave out.
 
 ## Cloud performance and determinism: 2023 South Lhonak hindcast on AWS
@@ -101,7 +103,7 @@ Raw AWS records and the scripts that rebuild these tables: [`evidence/2026-10-08
 **Test setup:**
 - **Deployment:** stack `cascade-glof` (us-west-2), Lambda container images (Python 3.14, x86_64), orchestrated by a Step Functions Standard workflow.
 - **Input:** every run used the same input, `events/hindcast-2023.json`, covering September–October 2023 for South Lhonak Lake.
-- **Runs:** on 8 Oct 2026 we ran **60 executions back to back**, after 2 earlier manual executions. All 62 succeeded.
+- **Runs:** on 8 Oct 2026 I ran **60 executions back to back**, after 2 earlier manual executions. All 62 succeeded.
 
 ### End to end (one Step Functions execution)
 
@@ -143,7 +145,7 @@ CloudWatch recorded 60 plan, 120 measure, 60 route and 60 report invocations ove
 | Peak flow / depth at the dam | 10,541 m³/s / 15.9 m | 10,541 m³/s / 15.9 m | 1 |
 | Warning time | 137.7 min | 137.7 min | 1 |
 
-The October high end differs from the local run by 0.0004 km². The first cloud run grew the stored lake footprint, which moved the October range from 1.2061–1.4634 km² in that run to 1.2063–1.464 km² in every run since. Every run since then has produced identical outputs. We measured the added area at about 330 m², but each run overwrites the footprint file, so that measurement isn't in the evidence.
+The October high end differs from the local run by 0.0004 km². The first cloud run grew the stored lake footprint, which moved the October range from 1.2061–1.4634 km² in that run to 1.2063–1.464 km² in every run since. Every run since then has produced identical outputs. I measured the added area at about 330 m², but each run overwrites the footprint file, so that measurement isn't in the evidence.
 
 ### What these numbers do and don't show
 
@@ -151,7 +153,7 @@ The October high end differs from the local run by 0.0004 km². The first cloud 
 - **Tail latency.** With 59 warm runs, the slowest run (8.2 s) is a 95% upper bound for warm p95 (1 − 0.95⁵⁹ = 0.952). That's why the batch had 60 runs rather than 20: with 20, the slowest run would be only a 64% bound. Medians use distribution-free confidence intervals from order statistics.
 - **Warm runs flatter real use.** Each warm run re-reads the same satellite image windows, and GDAL's in-memory HTTP cache probably serves part of them. A real run on new scenes will sit closer to the cold invoke times, about 10–12 s per lake-month.
 - **Cold starts are few.** Three cold runs are enough to show the pattern, not a distribution. Sampling more needs runs spaced 20–30 minutes or more apart, or a redeploy.
-- **The stored footprint drifts.** Its outline changes at the floating-point level on every run (45 of 45 hashed runs), without changing any output. After the last run the stored file had 449 vertices (17.9 KiB), the same size as in our earlier checks. The bucket keeps no old versions, so the evidence can't show the size over time.
+- **The stored footprint drifts.** Its outline changes at the floating-point level on every run (45 of 45 hashed runs), without changing any output. After the last run the stored file had 449 vertices (17.9 KiB), the same size as in my earlier checks. The bucket keeps no old versions, so the evidence can't show the size over time.
 - **One case study.** All of this is one lake and one event, the 2023 South Lhonak flood.
 
 **Cost:** 2,094 GB-s of Lambda time, 300 requests and about 7 state transitions per run comes to **$0.0455 for the 60 runs** ($0.00076 per run) at on-demand prices, inside the AWS free tier.
